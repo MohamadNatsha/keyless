@@ -12,7 +12,7 @@ interface NoteListProps {
 
 const NoteList: React.FC<NoteListProps> = ({ notes, selectedNoteId, onNoteClick }) => {
   return (
-    <div className="overflow-y-auto px-2 custom-scrollbar">
+    <div className="overflow-y-auto px-2 custom-scrollbar pt-1 pb-[20%] flex flex-col">
       {notes.map((note) => (
         <NoteListItem
           key={note.id}

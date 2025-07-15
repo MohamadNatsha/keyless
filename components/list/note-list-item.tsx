@@ -18,7 +18,7 @@ const truncate = (text: string, maxLength: number) => {
 const NoteListItem: React.FC<NoteListItemProps> = ({ title, summary, date, selected, onClick }) => {
   return (
     <div
-      className={`bg-base-300 mb-3 p-4${selected ? ' ring-2 ring-primary' : ''}`}
+      className={`p-4 hover:bg-base-300  ${selected ? 'ring-1 ring-primary bg-base-300 rounded-sm z-10' : 'bg-base-100 border-b-2 border-base-content/20'}`}
       style={{ cursor: onClick ? 'pointer' : undefined }}
       onClick={onClick}
     >
