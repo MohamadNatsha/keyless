@@ -4,10 +4,11 @@ import { db, DatabaseSchema } from './db';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const search = searchParams.get('search');
+  const offset = parseInt(searchParams.get('offset') || '0');
+  const limit = 10;
 
   let query = db.selectFrom('notes').selectAll();
   if (search) {
-    // Assuming db is Kysely or similar, and supports ilike for case-insensitive search
     query = query.where(q =>
       q.or([
         q('title', 'like', `%${search}%`),
@@ -15,7 +16,11 @@ export async function GET(request: Request) {
       ])
     );
   }
-  const notes = await query.orderBy('updatedAt', 'desc').execute();
+  const notes = await query
+    .orderBy('updatedAt', 'desc')
+    .limit(limit)
+    .offset(offset)
+    .execute();
   return NextResponse.json(notes);
 }
 
