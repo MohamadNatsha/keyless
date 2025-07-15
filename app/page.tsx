@@ -3,19 +3,26 @@
 import NoteList from "@/components/list/note-list";
 import { Note } from "../types/note";
 import { useEffect, useState } from "react";
+import { useTheme } from 'next-themes';
 import NoteEditor from "@/components/note-editor";
 import { PacmanLoader, MoonLoader } from "react-spinners";
-import { Search, NotebookPen } from "lucide-react";
+import { Search, NotebookPen, Sun, Moon } from "lucide-react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function Home() {
+  const { theme, setTheme, systemTheme } = useTheme();
   let [notes, setNotes] = useState<Note[]>([]);
   let [loading, setLoading] = useState(true);
   let [selectedNote, setSelectedNote] = useState<Note | null>(null);
-  let [theme, setTheme] = useState<"dark" | "light">("light");
   let [search, setSearch] = useState("");
   let [hasMore, setHasMore] = useState(true);
   let [creatingNote, setCreatingNote] = useState(false);
+
+  // Use resolved theme for className
+  const resolvedTheme = theme === 'system' ? systemTheme : theme;
+  function toggleTheme() {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+  }
 
   function searchNotes(search: string) {
     setSearch(search);
@@ -86,10 +93,20 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={`${theme === "dark" ? "dark" : ""} bg-base-100 max-h-screen h-screen w-screen max-h-screen grid grid-rows-[100%] grid-cols-[300px_1fr]`}>
+    <div className={`${resolvedTheme === "dark" ? "dark" : ""} bg-base-100 max-h-screen h-screen w-screen max-h-screen grid grid-rows-[100%] grid-cols-[300px_1fr]`}>
       <div className="h-full w-[300px]  text-base-content grid grid-rows-[180px_1fr]">
         <div className="p-4">
-          <h1 className="text-xl font-bold h-12 flex items-center mb-2">Keyless Notes</h1>
+          <div className="flex items-center justify-between mb-2 h-12">
+            <h1 className="text-xl font-bold flex items-center">Keyless Notes</h1>
+            <button
+              className="ml-2 p-2 rounded transition bg-base-200 hover:bg-base-300 text-base-content"
+              aria-label="Toggle theme"
+              onClick={toggleTheme}
+              title={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {resolvedTheme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+          </div>
           <div className="flex flex-col gap-3">
           <button
             className="flex items-center w-full justify-center gap-2 bg-primary hover:brightness-95 text-white font-semibold py-2 rounded transition"
@@ -116,7 +133,7 @@ export default function Home() {
         {
           loading ? (
             <div className="flex justify-center items-center h-full pb-16">
-              <MoonLoader className="text-base-content" size={32} color={theme === "dark" ? "white" : "black"} />
+              <MoonLoader className="text-base-content" size={32} color={resolvedTheme === "dark" ? "white" : "black"} />
             </div>
           ) : (
             <div id="note-scroll-container" className="max-h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
@@ -126,7 +143,7 @@ export default function Home() {
                 hasMore={hasMore}
                 loader={
                   <div className="flex justify-center items-center h-24">
-                    <MoonLoader className="text-base-content" size={24} color={theme === "dark" ? "white" : "black"} />
+                    <MoonLoader className="text-base-content" size={24} color={resolvedTheme === "dark" ? "white" : "black"} />
                   </div>
                 }
                 scrollableTarget="note-scroll-container"
@@ -139,7 +156,7 @@ export default function Home() {
       </div>
       <div className="bg-base-100 p-2  w-full">
         {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
-          <PacmanLoader className="text-base-content" color={theme === "dark" ? "white" : "black"}></PacmanLoader>
+          <PacmanLoader className="text-base-content" color={resolvedTheme === "dark" ? "white" : "black"}></PacmanLoader>
         </div> : <NoteEditor note={selectedNote} onCreateNote={() => {}} />}
       </div>
     </div>
