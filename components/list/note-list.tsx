@@ -16,7 +16,7 @@ const NoteList: React.FC<NoteListProps> = ({ notes, selectedNoteId, onNoteClick 
       {notes.map((note) => (
         <NoteListItem
           key={note.id}
-          title={note.title}
+          title={note.title || 'Untitled'}
           summary={note.content}
           date={note.createdAt instanceof Date ? note.createdAt.toLocaleDateString() : new Date(note.createdAt).toLocaleDateString()}
           selected={selectedNoteId === note.id}

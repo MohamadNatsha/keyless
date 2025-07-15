@@ -7,7 +7,6 @@ export interface NoteTable {
   id?: number; // Make id optional for insert
   title: string;
   content: string;
-  themeColor: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -30,7 +29,6 @@ async function ensureNotesTable() {
     .addColumn('id', 'integer', col => col.primaryKey().autoIncrement())
     .addColumn('title', 'text', col => col.notNull())
     .addColumn('content', 'text', col => col.notNull())
-    .addColumn('themeColor', 'text', col => col.notNull())
     .addColumn('createdAt', 'text', col => col.notNull())
     .addColumn('updatedAt', 'text', col => col.notNull())
     .execute();

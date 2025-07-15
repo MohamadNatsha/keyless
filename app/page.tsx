@@ -5,7 +5,7 @@ import { Note } from "../types/note";
 import { useEffect, useState } from "react";
 import NoteEditor from "@/components/note-editor";
 import { PacmanLoader, MoonLoader } from "react-spinners";
-import { Search, FilePlus } from "lucide-react";
+import { Search, NotebookPen } from "lucide-react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function Home() {
@@ -15,6 +15,7 @@ export default function Home() {
   let [theme, setTheme] = useState<"dark" | "light">("light");
   let [search, setSearch] = useState("");
   let [hasMore, setHasMore] = useState(true);
+  let [creatingNote, setCreatingNote] = useState(false);
 
   function searchNotes(search: string) {
     setSearch(search);
@@ -38,6 +39,29 @@ export default function Home() {
       createdAt: new Date(n.createdAt),
       updatedAt: new Date(n.updatedAt),
     }));
+  }
+
+  async function createNote() {
+    setCreatingNote(true);
+    try {
+      const res = await fetch('/api/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: '', content: '' })
+      });
+      if (!res.ok) throw new Error('Failed to create note');
+      const n = await res.json();
+      const newNote = {
+        ...n,
+        id: n.id.toString(),
+        createdAt: new Date(n.createdAt),
+        updatedAt: new Date(n.updatedAt),
+      };
+      setNotes(prev => [newNote, ...prev]);
+      setSelectedNote(newNote);
+    } finally {
+      setCreatingNote(false);
+    }
   }
 
   function loadMore() {
@@ -67,8 +91,12 @@ export default function Home() {
         <div className="p-4">
           <h1 className="text-xl font-bold h-12 flex items-center mb-2">Keyless Notes</h1>
           <div className="flex flex-col gap-3">
-          <button className="flex items-center w-full justify-center gap-2 bg-primary hover:brightness-95 text-white font-semibold py-2 rounded transition">
-            <FilePlus className="h-5 w-5" />
+          <button
+            className="flex items-center w-full justify-center gap-2 bg-primary hover:brightness-95 text-white font-semibold py-2 rounded transition"
+            onClick={createNote}
+            disabled={creatingNote}
+          >
+            <NotebookPen className="h-5 w-5" />
             New Note
           </button>
           <div className="relative">
@@ -110,7 +138,7 @@ export default function Home() {
         }
       </div>
       <div className="bg-base-100 p-2  w-full">
-        {loading ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
+        {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
           <PacmanLoader className="text-base-content" color={theme === "dark" ? "white" : "black"}></PacmanLoader>
         </div> : <NoteEditor note={selectedNote} onCreateNote={() => {}} />}
       </div>
