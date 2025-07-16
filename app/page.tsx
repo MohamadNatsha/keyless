@@ -98,7 +98,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={`bg-base-300 max-h-screen h-screen w-screen max-h-screen grid grid-rows-[100%] grid-cols-[300px_1fr]`}>
+    <div className={`bg-base-300 h-screen w-screen overflow-hidden grid grid-rows-[100%] grid-cols-[300px_1fr]`}>
       <div className="h-full w-[300px]  text-base-content grid grid-rows-[180px_1fr]">
         <div className="p-4">
           <div className="flex items-center justify-between mb-2 h-12">
@@ -160,7 +160,7 @@ export default function Home() {
           )
         }
       </div>
-      <div className="bg-base-300 p-2  w-full">
+      <div className="bg-base-300 p-2 overflow-hidden">
         {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
           {isClient && <PacmanLoader className="text-base-content" color={resolvedTheme === "dark" ? "white" : "black"}></PacmanLoader>}
         </div> : <NoteEditor note={selectedNote} onCreateNote={() => {}} />}
