@@ -11,8 +11,7 @@ interface NoteListProps {
 }
 
 const NoteList: React.FC<NoteListProps> = ({ notes, selectedNoteId, onNoteClick }) => {
-  return (
-    <div className="pl-2 pr-1 pt-1 flex flex-col">
+  return notes.length > 0 ? <div className="pl-2 pr-1 pt-1 flex flex-col">
       {notes.map((note) => (
         <NoteListItem
           key={note.id}
@@ -23,8 +22,9 @@ const NoteList: React.FC<NoteListProps> = ({ notes, selectedNoteId, onNoteClick 
           onClick={() => onNoteClick && onNoteClick(note)}
         />
       ))}
-    </div>
-  );
+    </div>: <div className="w-full h-full flex justify-center items-center"> There are no notes.</div>
+    
+  ;
 };
 
 export default NoteList;
