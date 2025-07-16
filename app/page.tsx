@@ -81,6 +81,14 @@ export default function Home() {
     }
   }
 
+  async function deleteNote() {
+    await fetch(`/api/notes/${selectedNote?.id}`, {
+      method: 'DELETE'
+    });
+    setNotes(prev => prev.filter(n => n.id !== selectedNote?.id));
+    setSelectedNote(null);
+  }
+
   async function saveNote(note: NoteCreationInput) {
   
     await fetch(`/api/notes/${selectedNote?.id}`, {
@@ -184,7 +192,7 @@ export default function Home() {
       <div className="bg-base-300 p-2 overflow-hidden">
         {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
           {isClient && <PacmanLoader className="text-base-content" color={resolvedTheme === "dark" ? "white" : "black"}></PacmanLoader>}
-        </div> : <NoteEditor onSaveNote={saveNote} note={selectedNote} onCreateNote={() => {}} />}
+        </div> : <NoteEditor onDeleteNote={deleteNote} onSaveNote={saveNote} note={selectedNote} onCreateNote={createNote} />}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { Note, NoteCreationInput } from "../types/note";
-import { useRef, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import '../components/note';
 import {
   IconList,
@@ -14,7 +14,9 @@ import {
   IconItalic,
   IconUnderline,
   IconStrikethrough,
-  IconDotsVertical
+  IconTrash,
+  IconAlertCircle,
+  IconTextPlus
 } from '@tabler/icons-react';
 import { Editor } from '@tiptap/core';
 
@@ -22,10 +24,12 @@ type NoteEditorProps = {
   note: Note | null;
   onCreateNote: () => void;
   onSaveNote: (note: NoteCreationInput) => Promise<void>;
+  onDeleteNote: () => Promise<void>;
 };
 
-export default function NoteEditor({ note, onCreateNote, onSaveNote }: NoteEditorProps) {
+export default function NoteEditor({ note, onCreateNote, onSaveNote, onDeleteNote }: NoteEditorProps) {
   const editorRef = useRef<any>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   function getEditor() {
    return editorRef.current.getEditor?.() as Editor | undefined;
   }
@@ -33,7 +37,6 @@ export default function NoteEditor({ note, onCreateNote, onSaveNote }: NoteEdito
   async function saveNote() {
     const title = editorRef.current.getTitle() ?? '';
     const content = editorRef.current.getContent() ?? '';
-    console.log(title, content);
     await onSaveNote({ title, content });
   }
 
@@ -85,8 +88,8 @@ export default function NoteEditor({ note, onCreateNote, onSaveNote }: NoteEdito
               <button onClick={saveNote} className="hover:bg-base-content-secondary/30 rounded-sm p-0.5 px-2">
                 <p>Save</p>
               </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5">
-                <IconDotsVertical />
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-1" onClick={() => setShowDeleteModal(true)}>
+                <IconTrash  className="w-5 h-5 text-error" />
               </button>
             </div>
           </div>
@@ -97,13 +100,42 @@ export default function NoteEditor({ note, onCreateNote, onSaveNote }: NoteEdito
         </div>
       </> : (
         <div className="flex flex-col items-center justify-center h-full">
-          <div className="text-gray-400 mb-4">No note selected.</div>
+          <div className="text-base-content-secondary mb-4">No note selected.</div>
           <button
-            className="btn btn-primary btn-outline"
+            className="flex items-center w-[400px] justify-center gap-2 bg-primary hover:brightness-95 text-white font-semibold py-2 rounded transition"
             onClick={onCreateNote}
           >
-            Create Note
+            <IconTextPlus className="h-5 w-5" />
+            New Note
           </button>
+        </div>
+      )}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 transition-all "></div>
+          <div className="relative bg-base-100 p-8 rounded-xl shadow-2xl border border-base-content/10 w-full max-w-xs sm:max-w-sm animate-pop-in">
+            <div className="flex flex-col items-center">
+              <IconAlertCircle className="mb-3 text-error w-12 h-12"/>
+              <div className="mb-4 text-lg font-semibold text-center text-base-content">Are you sure you want to delete?</div>
+              <div className="flex gap-3 w-full justify-end mt-2">
+                <button
+                  className="px-4 py-2 rounded-md font-medium"
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="bg-error text-error-content px-4 py-2 rounded-md font-medium shadow-sm hover:brightness-110"
+                  onClick={() => {
+                    onDeleteNote();
+                    setShowDeleteModal(false);
+                  }}
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
