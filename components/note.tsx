@@ -68,7 +68,12 @@ export class NoteViewer extends LitElement {
           e.preventDefault();
         }
       });
-    }    
+    }
+
+    // Listen for any input event inside the component
+    this.addEventListener('input', () => {
+      this.dispatchEvent(new CustomEvent('dirty', { bubbles: true, composed: true }));
+    });
 
     this.editor = new Editor({
       element: editorContainer,

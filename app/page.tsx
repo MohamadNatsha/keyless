@@ -2,14 +2,15 @@
 
 import NoteList from "@/components/list/note-list";
 import { Note, NoteCreationInput } from "../types/note";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef, useContext } from "react";
 import { useTheme } from 'next-themes';
 import NoteEditor from "@/components/note-editor";
 import { PacmanLoader, MoonLoader } from "react-spinners";
-import { IconSearch, IconTextPlus, IconSun, IconMoon, IconX, IconMenu } from "@tabler/icons-react";
+import { IconSearch, IconTextPlus, IconSun, IconMoon, IconX, IconMenu, IconAlertTriangle } from "@tabler/icons-react";
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { DirtyProvider, DirtyContext } from '../components/dirty-context';
 
-export default function Home() {
+function HomeContent() {
   const { theme, setTheme, systemTheme } = useTheme();
   let [notes, setNotes] = useState<Note[]>([]);
   let [loading, setLoading] = useState(true);
@@ -19,10 +20,23 @@ export default function Home() {
   let [creatingNote, setCreatingNote] = useState(false);
   let [isClient, setIsClient] = useState(false);
   let [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  let [showDirtyModal, setShowDirtyModal] = useState(false);
+  const { isDirty, setIsDirty } = useContext(DirtyContext);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
 
   const resolvedTheme = useMemo(() => theme === 'system' ? systemTheme : theme, [theme, systemTheme]);
 
@@ -127,6 +141,22 @@ export default function Home() {
     });
   }, []);
 
+  function handleNoteClick(note: Note) {
+    if (isDirty && selectedNote && note.id !== selectedNote.id) {
+      setShowDirtyModal(true);
+    } else {
+      setSelectedNote(note);
+    }
+  }
+
+  function handleDirtyModalConfirm() {
+    setShowDirtyModal(false);
+    setIsDirty(false);
+  }
+  function handleDirtyModalCancel() {
+    setShowDirtyModal(false);
+  }
+
   return (
     <div className={`relative bg-base-300 h-screen w-screen overflow-hidden grid grid-rows-[100%] grid-cols-[100%] md:grid-cols-[300px_1fr]`}>
       <div className={`${isSidebarOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'} transition-transform duration-300 max-md:absolute  left-0 bg-base-300 h-full w-full sm:w-[300px]  text-base-content flex flex-col max-h-screen overflow-hidden`}>
@@ -190,7 +220,7 @@ export default function Home() {
                 }
                 scrollableTarget="note-scroll-container"
               >
-                <NoteList onNoteClick={setSelectedNote} selectedNoteId={selectedNote?.id ?? undefined} notes={notes} />
+                <NoteList onNoteClick={handleNoteClick} selectedNoteId={selectedNote?.id ?? undefined} notes={notes} />
               </InfiniteScroll>
             </div>
           )
@@ -205,8 +235,31 @@ export default function Home() {
         {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
           {isClient && <PacmanLoader className="text-base-content" color={resolvedTheme === "dark" ? "white" : "black"}></PacmanLoader>}
         </div> : <NoteEditor onDeleteNote={deleteNote} onSaveNote={saveNote} note={selectedNote} onCreateNote={createNote} />}
+        {showDirtyModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40 transition-all "></div>
+            <div className="relative bg-base-100 p-8 rounded-xl shadow-2xl border border-base-content/10 w-full max-w-xs sm:max-w-sm animate-pop-in">
+              <div className="flex flex-col items-center">
+                <IconAlertTriangle className="mb-3 text-warning w-12 h-12"/>
+                <div className="mb-4 text-lg font-semibold text-center text-base-content">You have unsaved changes. Are you sure you want to leave?</div>
+                <div className="flex gap-3 w-full justify-end mt-2">
+                  <button className="px-4 py-2 rounded-md font-medium" onClick={handleDirtyModalCancel}>Stay</button>
+                  <button className="bg-warning text-warning-content px-4 py-2 rounded-md font-medium shadow-sm hover:brightness-110" onClick={handleDirtyModalConfirm}>Leave</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <DirtyProvider>
+      <HomeContent />
+    </DirtyProvider>
   );
 }
 

@@ -1,5 +1,5 @@
 import { Note, NoteCreationInput } from "../types/note";
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useContext } from 'react';
 import '../components/note';
 import {
   IconList,
@@ -19,6 +19,7 @@ import {
   IconTextPlus
 } from '@tabler/icons-react';
 import { Editor } from '@tiptap/core';
+import { DirtyContext } from './dirty-context';
 
 type NoteEditorProps = {
   note: Note | null;
@@ -30,6 +31,18 @@ type NoteEditorProps = {
 export default function NoteEditor({ note, onCreateNote, onSaveNote, onDeleteNote }: NoteEditorProps) {
   const editorRef = useRef<any>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { setIsDirty } = useContext(DirtyContext);
+
+  useEffect(() => {
+    if (!editorRef.current) return;
+    const noteViewer = editorRef.current;
+    const handleDirty = () => setIsDirty(true);
+    noteViewer.addEventListener('dirty', handleDirty);
+    return () => {
+      noteViewer.removeEventListener('dirty', handleDirty);
+    };
+  }, [setIsDirty, note, editorRef.current]);
+
   function getEditor() {
    return editorRef.current.getEditor?.() as Editor | undefined;
   }
