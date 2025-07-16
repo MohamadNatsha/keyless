@@ -10,6 +10,13 @@
   },
   "dependencies": {
     "@tabler/icons-react": "^3.34.0",
+    "@tiptap/core": "^3.0.6",
+    "@tiptap/extension-bullet-list": "^3.0.6",
+    "@tiptap/extension-heading": "^3.0.6",
+    "@tiptap/extension-ordered-list": "^3.0.6",
+    "@tiptap/extension-text-align": "^3.0.6",
+    "@tiptap/extension-underline": "^3.0.6",
+    "@tiptap/starter-kit": "^3.0.6",
     "better-sqlite3": "^12.2.0",
     "kysely": "^0.28.2",
     "lit": "^3.3.1",

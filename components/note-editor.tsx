@@ -1,4 +1,27 @@
 import { Note } from "../types/note";
+import { useRef, useEffect } from 'react';
+import '../components/note';
+import {
+  IconList,
+  IconListNumbers,
+  IconAlignLeft,
+  IconAlignCenter,
+  IconAlignRight,
+  IconH1,
+  IconH2,
+  IconH3,
+  IconBold,
+  IconItalic,
+  IconUnderline,
+  IconStrikethrough,
+  IconDotsVertical
+} from '@tabler/icons-react';
+import { Editor } from '@tiptap/core';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
+import BulletList from '@tiptap/extension-bullet-list';
+import OrderedList from '@tiptap/extension-ordered-list';
 
 type NoteEditorProps = {
   note: Note | null;
@@ -6,16 +29,71 @@ type NoteEditorProps = {
 };
 
 export default function NoteEditor({ note, onCreateNote }: NoteEditorProps) {
+  const editorRef = useRef<any>(null);
+  function getEditor() {
+   return editorRef.current.getEditor?.() as Editor | undefined;
+  }
+
   return (
-    <div className="bg-base-300 text-base-content rounded-lg h-full w-full">
-      {note ? (
-        <div className="max-h-full w-full custom-scrollbar overflow-y-auto px-4  flex flex-col items-center pt-16">
-          <div className="max-w-[680px] w-full pb-[20%]">
-            <h2 className="text-2xl font-bold">{note.title}</h2>
-            <p className="mt-2 whitespace-pre-wrap">{note.content}</p>
+    <div className="bg-base-100 text-base-content rounded-lg h-full w-full shadow-lg">
+      {note ? <>
+        <div className="w-full overflow-x-auto">
+          <div className="flex justify-between">
+            <div className="h-14 flex items-center p-4 pb-1 gap-4">
+            <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleBold().run()}>
+                <IconBold />
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleItalic().run()}>
+                <IconItalic />
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleUnderline().run()}>
+                <IconUnderline />
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleStrike().run()}>
+                <IconStrikethrough />
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleBulletList().run()}>
+                <IconList />
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleOrderedList().run()}>
+                <IconListNumbers />
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleHeading({ level: 1 }).run()}>
+                <IconH1 />
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleHeading({ level: 2 }).run()}>
+                <IconH2 />
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleHeading({ level: 3 }).run()}>
+                <IconH3 />
+              </button>
+         
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().setTextAlign('left').run()}>
+                <IconAlignLeft />
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().setTextAlign('center').run()}>
+                <IconAlignCenter />
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().setTextAlign('right').run()}>
+                <IconAlignRight />
+              </button>
+            </div>
+            <div className="h-14 flex items-center p-4 pb-1 gap-4">
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5 px-2">
+                <p>Save</p>
+              </button>
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5">
+                <IconDotsVertical />
+              </button>
+            </div>
           </div>
         </div>
-      ) : (
+
+        <div className="max-h-full w-full custom-scrollbar overflow-y-auto px-4 pt-4  flex flex-col items-center ">
+          {/* @ts-ignore */}
+          <note-viewer class="w-full h-full overflow-y-auto"  ref={editorRef} note={note} />
+        </div>
+      </> : (
         <div className="flex flex-col items-center justify-center h-full">
           <div className="text-gray-400 mb-4">No note selected.</div>
           <button
