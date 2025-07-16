@@ -2,7 +2,7 @@
 
 import NoteList from "@/components/list/note-list";
 import { Note } from "../types/note";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTheme } from 'next-themes';
 import NoteEditor from "@/components/note-editor";
 import { PacmanLoader, MoonLoader } from "react-spinners";
@@ -17,9 +17,14 @@ export default function Home() {
   let [search, setSearch] = useState("");
   let [hasMore, setHasMore] = useState(true);
   let [creatingNote, setCreatingNote] = useState(false);
+  let [isClient, setIsClient] = useState(false);
 
-  // Use resolved theme for className
-  const resolvedTheme = theme === 'system' ? systemTheme : theme;
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const resolvedTheme = useMemo(() => theme === 'system' ? systemTheme : theme, [theme, systemTheme]);
+  
   function toggleTheme() {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
   }
@@ -93,7 +98,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={`${resolvedTheme === "dark" ? "dark" : ""} bg-base-100 max-h-screen h-screen w-screen max-h-screen grid grid-rows-[100%] grid-cols-[300px_1fr]`}>
+    <div className={`bg-base-100 max-h-screen h-screen w-screen max-h-screen grid grid-rows-[100%] grid-cols-[300px_1fr]`}>
       <div className="h-full w-[300px]  text-base-content grid grid-rows-[180px_1fr]">
         <div className="p-4">
           <div className="flex items-center justify-between mb-2 h-12">
@@ -104,7 +109,7 @@ export default function Home() {
               onClick={toggleTheme}
               title={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {resolvedTheme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {isClient && (resolvedTheme === 'dark' ? <Sun suppressHydrationWarning className="w-5 h-5" /> : <Moon suppressHydrationWarning className="w-5 h-5" />)}
             </button>
           </div>
           <div className="flex flex-col gap-3">
@@ -133,7 +138,7 @@ export default function Home() {
         {
           loading ? (
             <div className="flex justify-center items-center h-full pb-16">
-              <MoonLoader className="text-base-content" size={32} color={resolvedTheme === "dark" ? "white" : "black"} />
+              {isClient && <MoonLoader className="text-base-content" size={32} color={resolvedTheme === "dark" ? "white" : "black"} />}
             </div>
           ) : (
             <div id="note-scroll-container" className="max-h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
@@ -143,7 +148,7 @@ export default function Home() {
                 hasMore={hasMore}
                 loader={
                   <div className="flex justify-center items-center h-24">
-                    <MoonLoader className="text-base-content" size={24} color={resolvedTheme === "dark" ? "white" : "black"} />
+                    {isClient && <MoonLoader className="text-base-content" size={24} color={resolvedTheme === "dark" ? "white" : "black"} />}
                   </div>
                 }
                 scrollableTarget="note-scroll-container"
@@ -156,7 +161,7 @@ export default function Home() {
       </div>
       <div className="bg-base-100 p-2  w-full">
         {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
-          <PacmanLoader className="text-base-content" color={resolvedTheme === "dark" ? "white" : "black"}></PacmanLoader>
+          {isClient && <PacmanLoader className="text-base-content" color={resolvedTheme === "dark" ? "white" : "black"}></PacmanLoader>}
         </div> : <NoteEditor note={selectedNote} onCreateNote={() => {}} />}
       </div>
     </div>
