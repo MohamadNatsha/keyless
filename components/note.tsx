@@ -38,6 +38,13 @@ export class NoteViewer extends LitElement {
       pointer-events: none;
       font-style: italic;
     }
+
+    .title:has(:only-child, br)::before {
+      content: 'Untitled';
+      color: #aaa;
+      pointer-events: none;
+      font-style: italic;
+    }
   `;
 
   static properties = {
@@ -61,27 +68,13 @@ export class NoteViewer extends LitElement {
           e.preventDefault();
         }
       });
-
-      // Remove <br> if that's the only content, so :empty works
-      titleDiv.addEventListener('input', () => {
-        if (
-          titleDiv.innerHTML === '<br>' ||
-          titleDiv.innerHTML === '<br/>' ||
-          titleDiv.innerHTML === '<br />'
-        ) {
-          titleDiv.innerHTML = '';
-        }
-      });
     }    
 
     this.editor = new Editor({
       element: editorContainer,
       extensions: [
         StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
-        Underline,
         TextAlign.configure({ types: ['heading', 'paragraph'] }),
-        BulletList,
-        OrderedList
       ],
       content: this.content ?? '<p></p>',
     });

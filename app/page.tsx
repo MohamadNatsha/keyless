@@ -59,7 +59,7 @@ export default function Home() {
       const res = await fetch('/api/notes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: '', content: '' })
+        body: JSON.stringify({ title: 'Untitled', content: '' })
       });
       if (!res.ok) throw new Error('Failed to create note');
       const n = await res.json();
@@ -78,7 +78,7 @@ export default function Home() {
 
   async function saveNote(note: NoteCreationInput) {
   
-    const updatedNote = await fetch(`/api/notes/${selectedNote?.id}`, {
+    await fetch(`/api/notes/${selectedNote?.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(note)
