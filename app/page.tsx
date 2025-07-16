@@ -9,6 +9,7 @@ import { PacmanLoader, MoonLoader } from "react-spinners";
 import { IconSearch, IconTextPlus, IconSun, IconMoon, IconX, IconMenu, IconAlertTriangle } from "@tabler/icons-react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { DirtyProvider, DirtyContext } from '../components/dirty-context';
+import { oklch, formatHex } from 'culori';
 
 function HomeContent() {
   const { theme, setTheme, systemTheme } = useTheme();
@@ -22,10 +23,17 @@ function HomeContent() {
   let [isSidebarOpen, setIsSidebarOpen] = useState(true);
   let [showDirtyModal, setShowDirtyModal] = useState(false);
   const { isDirty, setIsDirty } = useContext(DirtyContext);
-
+  const [primaryColor, setPrimaryColor] = useState('#000000');
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const primaryColor = getComputedStyle(root).getPropertyValue('--color-primary').trim();
+    setPrimaryColor(primaryColor);
+    console.log('primaryColor', formatHex(oklch(primaryColor)));
+  }, [systemTheme,theme]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -169,15 +177,15 @@ function HomeContent() {
           </div>
           <div className="flex items-center justify-between mb-2 h-12">
             <h1 className="text-xl font-bold flex items-center">Keyless Notes</h1>
-            <button
+            {isClient && <button
               className="ml-2 p-2 rounded transition bg-base-100 hover:bg-base-100 text-base-content"
               aria-label="Toggle theme"
               onClick={toggleTheme}
               suppressHydrationWarning
               title={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {isClient && (resolvedTheme === 'dark' ? <IconSun suppressHydrationWarning className="w-5 h-5 text-primary" /> : <IconMoon suppressHydrationWarning className="w-5 h-5 text-primary" />)}
-            </button>
+              {(resolvedTheme === 'dark' ? <IconSun suppressHydrationWarning className="w-5 h-5 text-primary" /> : <IconMoon suppressHydrationWarning className="w-5 h-5 text-primary" />)}
+            </button>}
           </div>
           <div className="flex flex-col gap-3">
             <button
@@ -205,7 +213,7 @@ function HomeContent() {
         {
           loading ? (
             <div className="flex justify-center items-center h-full pb-16">
-              {isClient && <MoonLoader className="text-base-content" size={32} color={resolvedTheme === "dark" ? "white" : "black"} />}
+              {isClient && <MoonLoader className="text-base-content" size={32} color={primaryColor} />}
             </div>
           ) : (
             <div id="note-scroll-container" className=" overflow-y-auto custom-scrollbar">
@@ -215,7 +223,7 @@ function HomeContent() {
                 hasMore={hasMore}
                 loader={
                   <div className="flex justify-center items-center h-24">
-                    {isClient && <MoonLoader className="text-base-content" size={24} color={resolvedTheme === "dark" ? "white" : "black"} />}
+                    {isClient && <MoonLoader className="text-base-content" size={24} color={primaryColor} />}
                   </div>
                 }
                 scrollableTarget="note-scroll-container"
@@ -233,7 +241,7 @@ function HomeContent() {
           </button>
         </div>
         {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
-          {isClient && <PacmanLoader className="text-base-content" color={resolvedTheme === "dark" ? "white" : "black"}></PacmanLoader>}
+          {isClient && <PacmanLoader className="text-base-content" color={primaryColor}></PacmanLoader>}
         </div> : <NoteEditor onDeleteNote={deleteNote} onSaveNote={saveNote} note={selectedNote} onCreateNote={createNote} />}
         {showDirtyModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">

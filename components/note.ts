@@ -1,11 +1,17 @@
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'note-viewer': any;
+    }
+  }
+}
+
 import { html, css, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
-import BulletList from '@tiptap/extension-bullet-list';
-import OrderedList from '@tiptap/extension-ordered-list';
+
 
 @customElement('note-viewer')
 export class NoteViewer extends LitElement {
@@ -131,3 +137,4 @@ export class NoteViewer extends LitElement {
    `;
   }
 }
+

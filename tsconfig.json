@@ -18,6 +18,8 @@
         "name": "next"
       }
     ],
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
     "paths": {
       "@/*": ["./*"]
     }
