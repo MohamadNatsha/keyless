@@ -1,5 +1,5 @@
 import { html, css, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -40,8 +40,15 @@ export class NoteViewer extends LitElement {
     }
   `;
 
+  static properties = {
+    title: { type: String },
+    content: { type: String },
+  };
+
+  declare title: string;
+  declare content: string;
+
   firstUpdated() {
-    console.log(this.renderRoot);
     const editorContainer = this.renderRoot.querySelector('#editor') as HTMLElement;
 
     // Prevent Enter from creating a new line in the title
@@ -65,7 +72,7 @@ export class NoteViewer extends LitElement {
           titleDiv.innerHTML = '';
         }
       });
-    }
+    }    
 
     this.editor = new Editor({
       element: editorContainer,
@@ -76,7 +83,7 @@ export class NoteViewer extends LitElement {
         BulletList,
         OrderedList
       ],
-      content: '<p></p>',
+      content: this.content ?? '<p></p>',
     });
   
   }
@@ -90,10 +97,36 @@ export class NoteViewer extends LitElement {
     return this.editor;
   }
 
+  public getTitle() {
+    return this.renderRoot.querySelector('.title')?.textContent;
+  }
+
+  public getContent() {
+    return this.editor?.getHTML() ?? '';
+  }
+
+  updated(changedProperties: Map<string, any>) {
+    if (changedProperties.has('content')) {
+      // Only update if the new content is different from the editor's current content
+      if (this.editor && this.content !== this.editor.getHTML()) {
+        // If content is JSON, parse it, otherwise use as string
+        let newContent: any = '<p></p>';
+        try {
+          newContent = JSON.parse(this.content);
+        } catch {
+          newContent = this.content;
+        }
+        this.editor.commands.setContent(newContent);
+      }
+    }
+  }
+
   render() {
     return html`
     <div style="padding: 12px;">
-      <div class="title" style="font-size: 24px; font-weight: bold; outline: none; white-space: nowrap;" contenteditable="true"></div>  
+      <div class="title" style="font-size: 24px; font-weight: bold; outline: none; white-space: nowrap;" contenteditable="true">
+      ${this.title}
+      </div>  
       <div class="editor" id="editor">
       </div>
     </div>

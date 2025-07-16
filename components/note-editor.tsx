@@ -1,4 +1,4 @@
-import { Note } from "../types/note";
+import { Note, NoteCreationInput } from "../types/note";
 import { useRef, useEffect } from 'react';
 import '../components/note';
 import {
@@ -17,21 +17,24 @@ import {
   IconDotsVertical
 } from '@tabler/icons-react';
 import { Editor } from '@tiptap/core';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-import TextAlign from '@tiptap/extension-text-align';
-import BulletList from '@tiptap/extension-bullet-list';
-import OrderedList from '@tiptap/extension-ordered-list';
 
 type NoteEditorProps = {
   note: Note | null;
   onCreateNote: () => void;
+  onSaveNote: (note: NoteCreationInput) => Promise<void>;
 };
 
-export default function NoteEditor({ note, onCreateNote }: NoteEditorProps) {
+export default function NoteEditor({ note, onCreateNote, onSaveNote }: NoteEditorProps) {
   const editorRef = useRef<any>(null);
   function getEditor() {
    return editorRef.current.getEditor?.() as Editor | undefined;
+  }
+
+  async function saveNote() {
+    const title = editorRef.current.getTitle() ?? '';
+    const content = editorRef.current.getContent() ?? '';
+    console.log(title, content);
+    await onSaveNote({ title, content });
   }
 
   return (
@@ -79,7 +82,7 @@ export default function NoteEditor({ note, onCreateNote }: NoteEditorProps) {
               </button>
             </div>
             <div className="h-14 flex items-center p-4 pb-1 gap-4">
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5 px-2">
+              <button onClick={saveNote} className="hover:bg-base-content-secondary/30 rounded-sm p-0.5 px-2">
                 <p>Save</p>
               </button>
               <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5">
@@ -90,8 +93,7 @@ export default function NoteEditor({ note, onCreateNote }: NoteEditorProps) {
         </div>
 
         <div className="max-h-full w-full custom-scrollbar overflow-y-auto px-4 pt-4  flex flex-col items-center ">
-          {/* @ts-ignore */}
-          <note-viewer class="w-full h-full overflow-y-auto"  ref={editorRef} note={note} />
+          <note-viewer class="w-full h-full overflow-y-auto"  ref={editorRef} title={note?.title} content={note?.content} />
         </div>
       </> : (
         <div className="flex flex-col items-center justify-center h-full">

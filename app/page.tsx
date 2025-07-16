@@ -1,7 +1,7 @@
 'use client'
 
 import NoteList from "@/components/list/note-list";
-import { Note } from "../types/note";
+import { Note, NoteCreationInput } from "../types/note";
 import { useEffect, useMemo, useState } from "react";
 import { useTheme } from 'next-themes';
 import NoteEditor from "@/components/note-editor";
@@ -74,6 +74,27 @@ export default function Home() {
     } finally {
       setCreatingNote(false);
     }
+  }
+
+  async function saveNote(note: NoteCreationInput) {
+  
+    const updatedNote = await fetch(`/api/notes/${selectedNote?.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(note)
+    });
+
+    setNotes(prev => {
+      const newNotes = [...prev];
+      const selectedNoteIndex = newNotes.findIndex(n => n.id === selectedNote?.id);
+      if (selectedNoteIndex !== -1) {
+        newNotes[selectedNoteIndex] = {
+          ...newNotes[selectedNoteIndex],
+          ...note
+        };
+      }
+      return newNotes;
+    });
   }
 
   function loadMore() {
@@ -163,7 +184,7 @@ export default function Home() {
       <div className="bg-base-300 p-2 overflow-hidden">
         {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
           {isClient && <PacmanLoader className="text-base-content" color={resolvedTheme === "dark" ? "white" : "black"}></PacmanLoader>}
-        </div> : <NoteEditor note={selectedNote} onCreateNote={() => {}} />}
+        </div> : <NoteEditor onSaveNote={saveNote} note={selectedNote} onCreateNote={() => {}} />}
       </div>
     </div>
   );
