@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTheme } from 'next-themes';
 import NoteEditor from "@/components/note-editor";
 import { PacmanLoader, MoonLoader } from "react-spinners";
-import { Search, NotebookPen, Sun, Moon } from "lucide-react";
+import { IconSearch, IconTextPlus, IconSun, IconMoon } from "@tabler/icons-react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function Home() {
@@ -107,9 +107,10 @@ export default function Home() {
               className="ml-2 p-2 rounded transition bg-base-200 hover:bg-base-300 text-base-content"
               aria-label="Toggle theme"
               onClick={toggleTheme}
+              suppressHydrationWarning
               title={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {isClient && (resolvedTheme === 'dark' ? <Sun suppressHydrationWarning className="w-5 h-5" /> : <Moon suppressHydrationWarning className="w-5 h-5" />)}
+              {isClient && (resolvedTheme === 'dark' ? <IconSun suppressHydrationWarning className="w-5 h-5" /> : <IconMoon suppressHydrationWarning className="w-5 h-5" />)}
             </button>
           </div>
           <div className="flex flex-col gap-3">
@@ -118,12 +119,12 @@ export default function Home() {
             onClick={createNote}
             disabled={creatingNote}
           >
-            <NotebookPen className="h-5 w-5" />
+            <IconTextPlus className="h-5 w-5" />
             New Note
           </button>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content">
-              <Search className="h-5 w-5" />
+              <IconSearch className="h-5 w-5" />
             </span>
             <input
               type="text"
