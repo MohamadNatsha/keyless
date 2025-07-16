@@ -31,9 +31,9 @@ export default function Home() {
 
   function searchNotes(search: string) {
     setSearch(search);
+    setHasMore(true);
     fetchNotes({ search }).then(notes => {
       setNotes(notes);
-      setHasMore(true);
     });
   };
 
@@ -45,6 +45,11 @@ export default function Home() {
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch notes");
     const notes = await res.json();
+
+    if(notes.length < 10) {
+      setHasMore(false);
+    }
+    
     return notes.map((n: any) => ({
       ...n,
       id: n.id.toString(),
@@ -100,11 +105,6 @@ export default function Home() {
   function loadMore() {
     fetchNotes({ search, offset: notes.length }).then(notes => {
       setNotes(prev => [...prev, ...notes]);
-      if(notes.length === 0) {
-        setHasMore(false);
-      }
-
-      console.log('loaded more notes');
     });
   }
 
@@ -155,7 +155,7 @@ export default function Home() {
               onChange={e => searchNotes(e.target.value)}
             />
           </div>
-          </div>
+          </div>    
         </div>
         {
           loading ? (
@@ -169,7 +169,7 @@ export default function Home() {
                 next={loadMore}
                 hasMore={hasMore}
                 loader={
-                  <div className="flex justify-center items-center h-24">
+                   <div className="flex justify-center items-center h-24">
                     {isClient && <MoonLoader className="text-base-content" size={24} color={resolvedTheme === "dark" ? "white" : "black"} />}
                   </div>
                 }
