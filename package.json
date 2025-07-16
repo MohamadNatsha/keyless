@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "docker": "docker build -t keyless-notes . && docker run -p 3000:3000 keyless-notes"
   },
   "dependencies": {
     "@tabler/icons-react": "^3.34.0",
