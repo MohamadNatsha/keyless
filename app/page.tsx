@@ -98,19 +98,19 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={`bg-base-100 max-h-screen h-screen w-screen max-h-screen grid grid-rows-[100%] grid-cols-[300px_1fr]`}>
+    <div className={`bg-base-300 max-h-screen h-screen w-screen max-h-screen grid grid-rows-[100%] grid-cols-[300px_1fr]`}>
       <div className="h-full w-[300px]  text-base-content grid grid-rows-[180px_1fr]">
         <div className="p-4">
           <div className="flex items-center justify-between mb-2 h-12">
             <h1 className="text-xl font-bold flex items-center">Keyless Notes</h1>
             <button
-              className="ml-2 p-2 rounded transition bg-base-200 hover:bg-base-300 text-base-content"
+              className="ml-2 p-2 rounded transition bg-base-100 hover:bg-base-100 text-base-content"
               aria-label="Toggle theme"
               onClick={toggleTheme}
               suppressHydrationWarning
               title={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {isClient && (resolvedTheme === 'dark' ? <IconSun suppressHydrationWarning className="w-5 h-5" /> : <IconMoon suppressHydrationWarning className="w-5 h-5" />)}
+              {isClient && (resolvedTheme === 'dark' ? <IconSun suppressHydrationWarning className="w-5 h-5 text-primary" /> : <IconMoon suppressHydrationWarning className="w-5 h-5 text-primary" />)}
             </button>
           </div>
           <div className="flex flex-col gap-3">
@@ -122,14 +122,14 @@ export default function Home() {
             <IconTextPlus className="h-5 w-5" />
             New Note
           </button>
-          <div className="relative">
+          <div className="relative ">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content">
               <IconSearch className="h-5 w-5" />
             </span>
             <input
               type="text"
               placeholder="Search notes..."
-              className="input input-bordered w-full pl-10 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-base-200 text-base-content"
+              className="input input-bordered w-full pl-10 py-2 rounded focus:outline-none focus:ring-2  bg-base-200 text-base-content outline outline-base-content-secondary/60"
               value={search}
               onChange={e => searchNotes(e.target.value)}
             />
@@ -160,7 +160,7 @@ export default function Home() {
           )
         }
       </div>
-      <div className="bg-base-100 p-2  w-full">
+      <div className="bg-base-300 p-2  w-full">
         {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
           {isClient && <PacmanLoader className="text-base-content" color={resolvedTheme === "dark" ? "white" : "black"}></PacmanLoader>}
         </div> : <NoteEditor note={selectedNote} onCreateNote={() => {}} />}
