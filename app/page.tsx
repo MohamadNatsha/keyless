@@ -2,14 +2,13 @@
 
 import NoteList from "@/components/list/note-list";
 import { Note, NoteCreationInput } from "../types/note";
-import { useEffect, useMemo, useState, useRef, useContext } from "react";
+import { useEffect, useMemo, useState, useContext } from "react";
 import { useTheme } from 'next-themes';
 import NoteEditor from "@/components/note-editor";
 import { PacmanLoader, MoonLoader } from "react-spinners";
 import { IconSearch, IconTextPlus, IconSun, IconMoon, IconX, IconMenu, IconAlertTriangle } from "@tabler/icons-react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { DirtyProvider, DirtyContext } from '../components/dirty-context';
-import { oklch, formatHex } from 'culori';
 
 function HomeContent() {
   const { theme, setTheme, systemTheme } = useTheme();
@@ -20,7 +19,7 @@ function HomeContent() {
   let [hasMore, setHasMore] = useState(true);
   let [creatingNote, setCreatingNote] = useState(false);
   let [isClient, setIsClient] = useState(false);
-  let [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  let [isSidebarOpen, setIsSidebarOpen] = useState(false);
   let [showDirtyModal, setShowDirtyModal] = useState(false);
   const { isDirty, setIsDirty, setShowWarning } = useContext(DirtyContext);
   const [primaryColor, setPrimaryColor] = useState('#000000');
@@ -29,11 +28,13 @@ function HomeContent() {
   }, []);
 
   useEffect(() => {
-    const root = document.documentElement;
-    const primaryColor = getComputedStyle(root).getPropertyValue('--color-primary').trim();
-    setPrimaryColor(primaryColor);
-    console.log('primaryColor', formatHex(oklch(primaryColor)));
-  }, [systemTheme,theme]);
+    const raf = requestAnimationFrame(() => {
+      const root = document.documentElement;
+      const primaryColor = getComputedStyle(root).getPropertyValue('--color-primary').trim();
+      setPrimaryColor(primaryColor);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [theme, setTheme, systemTheme]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {

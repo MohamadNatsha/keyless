@@ -15,7 +15,7 @@ import TextAlign from '@tiptap/extension-text-align';
 
 @customElement('note-viewer')
 export class NoteViewer extends LitElement {
-  public editor?: Editor; // made public
+  public editor?: Editor;
 
   static styles = css`
     .editor {
