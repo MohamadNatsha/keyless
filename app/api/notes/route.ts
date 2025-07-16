@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db, DatabaseSchema } from './db';
+import { getDb } from './db';
 
 export async function GET(request: Request) {
+  const db = await getDb();
   const { searchParams } = new URL(request.url);
   const search = searchParams.get('search');
   const offset = parseInt(searchParams.get('offset') || '0');
@@ -25,6 +26,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(req: NextRequest) {
+  const db = await getDb();
   const { title, content } = await req.json();
   const now = new Date().toISOString();
   const insertResult = await db.insertInto('notes')

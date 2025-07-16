@@ -22,6 +22,8 @@ export const db = new Kysely<DatabaseSchema>({
 });
 
 // Ensure the notes table exists on app start
+let ready = ensureNotesTable();
+
 async function ensureNotesTable() {
   await db.schema
     .createTable('notes')
@@ -36,5 +38,7 @@ async function ensureNotesTable() {
   console.log('Tables setup completed');
 }
 
-// Immediately invoke the function
-ensureNotesTable().catch(console.error); 
+export async function getDb() {
+  await ready;
+  return db;
+} 
