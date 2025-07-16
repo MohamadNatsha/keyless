@@ -25,10 +25,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(req: NextRequest) {
-  const { title, content, themeColor } = await req.json();
+  const { title, content } = await req.json();
   const now = new Date().toISOString();
   const insertResult = await db.insertInto('notes')
-    .values({ title, content, themeColor, createdAt: now, updatedAt: now })
+    .values({ title, content, createdAt: now, updatedAt: now })
     .returningAll()
     .executeTakeFirst();
   return NextResponse.json(insertResult, { status: 201 });

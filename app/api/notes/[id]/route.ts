@@ -14,10 +14,10 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { title, content, themeColor } = await req.json();
+  const { title, content } = await req.json();
   const now = new Date().toISOString();
   await db.updateTable('notes')
-    .set({ title, content, themeColor, updatedAt: now })
+    .set({ title, content, updatedAt: now })
     .where('id', '=', Number(params.id))
     .execute();
   const note = await db.selectFrom('notes').selectAll().where('id', '=', Number(params.id)).executeTakeFirst();
