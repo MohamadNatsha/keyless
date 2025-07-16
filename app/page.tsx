@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTheme } from 'next-themes';
 import NoteEditor from "@/components/note-editor";
 import { PacmanLoader, MoonLoader } from "react-spinners";
-import { IconSearch, IconTextPlus, IconSun, IconMoon } from "@tabler/icons-react";
+import { IconSearch, IconTextPlus, IconSun, IconMoon, IconX, IconMenu } from "@tabler/icons-react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function Home() {
@@ -18,13 +18,14 @@ export default function Home() {
   let [hasMore, setHasMore] = useState(true);
   let [creatingNote, setCreatingNote] = useState(false);
   let [isClient, setIsClient] = useState(false);
+  let [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   const resolvedTheme = useMemo(() => theme === 'system' ? systemTheme : theme, [theme, systemTheme]);
-  
+
   function toggleTheme() {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
   }
@@ -49,7 +50,7 @@ export default function Home() {
     if(notes.length < 10) {
       setHasMore(false);
     }
-    
+
     return notes.map((n: any) => ({
       ...n,
       id: n.id.toString(),
@@ -90,7 +91,7 @@ export default function Home() {
   }
 
   async function saveNote(note: NoteCreationInput) {
-  
+
     await fetch(`/api/notes/${selectedNote?.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -127,9 +128,15 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={`bg-base-300 h-screen w-screen overflow-hidden grid grid-rows-[100%] grid-cols-[300px_1fr]`}>
-      <div className="h-full w-[300px]  text-base-content grid grid-rows-[180px_1fr]">
+    <div className={`relative bg-base-300 h-screen w-screen overflow-hidden grid grid-rows-[100%] grid-cols-[100%] md:grid-cols-[300px_1fr]`}>
+      <div className={`${isSidebarOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'} transition-transform duration-300 max-md:absolute  left-0 bg-base-300 h-full w-full sm:w-[300px]  text-base-content flex flex-col max-h-screen overflow-hidden`}>
+
         <div className="p-4">
+          <div className="md:hidden h-8 mb-2 flex items-center justify-between w-full">
+            <button className="rounded transition hover:bg-base-100 text-base-content" aria-label="Toggle theme" onClick={() => setIsSidebarOpen(false)}>
+              <IconX className="w-5 h-5" />
+            </button>
+          </div>
           <div className="flex items-center justify-between mb-2 h-12">
             <h1 className="text-xl font-bold flex items-center">Keyless Notes</h1>
             <button
@@ -143,27 +150,27 @@ export default function Home() {
             </button>
           </div>
           <div className="flex flex-col gap-3">
-          <button
-            className="flex items-center w-full justify-center gap-2 bg-primary hover:brightness-95 text-white font-semibold py-2 rounded transition"
-            onClick={createNote}
-            disabled={creatingNote}
-          >
-            <IconTextPlus className="h-5 w-5" />
-            New Note
-          </button>
-          <div className="relative ">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content">
-              <IconSearch className="h-5 w-5" />
-            </span>
-            <input
-              type="text"
-              placeholder="Search notes..."
-              className="input input-bordered w-full pl-10 py-2 rounded focus:outline-none focus:ring-2  bg-base-200 text-base-content outline outline-base-content-secondary/60"
-              value={search}
-              onChange={e => searchNotes(e.target.value)}
-            />
+            <button
+              className="flex items-center w-full justify-center gap-2 bg-primary hover:brightness-95 text-white font-semibold py-2 rounded transition"
+              onClick={createNote}
+              disabled={creatingNote}
+            >
+              <IconTextPlus className="h-5 w-5" />
+              New Note
+            </button>
+            <div className="relative ">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content">
+                <IconSearch className="h-5 w-5" />
+              </span>
+              <input
+                type="text"
+                placeholder="Search notes..."
+                className="input input-bordered w-full pl-10 py-2 rounded focus:outline-none focus:ring-2  bg-base-200 text-base-content outline outline-base-content-secondary/60"
+                value={search}
+                onChange={e => searchNotes(e.target.value)}
+              />
+            </div>
           </div>
-          </div>    
         </div>
         {
           loading ? (
@@ -171,13 +178,13 @@ export default function Home() {
               {isClient && <MoonLoader className="text-base-content" size={32} color={resolvedTheme === "dark" ? "white" : "black"} />}
             </div>
           ) : (
-            <div id="note-scroll-container" className="max-h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+            <div id="note-scroll-container" className=" overflow-y-auto custom-scrollbar">
               <InfiniteScroll
                 dataLength={notes.length}
                 next={loadMore}
                 hasMore={hasMore}
                 loader={
-                   <div className="flex justify-center items-center h-24">
+                  <div className="flex justify-center items-center h-24">
                     {isClient && <MoonLoader className="text-base-content" size={24} color={resolvedTheme === "dark" ? "white" : "black"} />}
                   </div>
                 }
@@ -189,7 +196,12 @@ export default function Home() {
           )
         }
       </div>
-      <div className="bg-base-300 p-2 overflow-hidden">
+      <div className="bg-base-300 flex flex-col p-2 pt-4 overflow-hidden">
+        <div className="md:hidden h-8 p-2 mb-2 flex items-center justify-between w-full">
+          <button className="rounded transition hover:bg-base-100 text-base-content" aria-label="Toggle theme" onClick={() => setIsSidebarOpen(true)}>
+            <IconMenu className="w-5 h-5" />
+          </button>
+        </div>
         {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
           {isClient && <PacmanLoader className="text-base-content" color={resolvedTheme === "dark" ? "white" : "black"}></PacmanLoader>}
         </div> : <NoteEditor onDeleteNote={deleteNote} onSaveNote={saveNote} note={selectedNote} onCreateNote={createNote} />}
