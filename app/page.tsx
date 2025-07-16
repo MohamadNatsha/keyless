@@ -22,7 +22,7 @@ function HomeContent() {
   let [isClient, setIsClient] = useState(false);
   let [isSidebarOpen, setIsSidebarOpen] = useState(true);
   let [showDirtyModal, setShowDirtyModal] = useState(false);
-  const { isDirty, setIsDirty } = useContext(DirtyContext);
+  const { isDirty, setIsDirty, setShowWarning } = useContext(DirtyContext);
   const [primaryColor, setPrimaryColor] = useState('#000000');
   useEffect(() => {
     setIsClient(true);
@@ -151,7 +151,9 @@ function HomeContent() {
 
   function handleNoteClick(note: Note) {
     if (isDirty && selectedNote && note.id !== selectedNote.id) {
-      setShowDirtyModal(true);
+      setShowWarning(true, () => {
+        setSelectedNote(note);
+      });
     } else {
       setSelectedNote(note);
     }
@@ -243,21 +245,6 @@ function HomeContent() {
         {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
           {isClient && <PacmanLoader className="text-base-content" color={primaryColor}></PacmanLoader>}
         </div> : <NoteEditor onDeleteNote={deleteNote} onSaveNote={saveNote} note={selectedNote} onCreateNote={createNote} />}
-        {showDirtyModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/40 transition-all "></div>
-            <div className="relative bg-base-100 p-8 rounded-xl shadow-2xl border border-base-content/10 w-full max-w-xs sm:max-w-sm animate-pop-in">
-              <div className="flex flex-col items-center">
-                <IconAlertTriangle className="mb-3 text-warning w-12 h-12"/>
-                <div className="mb-4 text-lg font-semibold text-center text-base-content">You have unsaved changes. Are you sure you want to leave?</div>
-                <div className="flex gap-3 w-full justify-end mt-2">
-                  <button className="px-4 py-2 rounded-md font-medium" onClick={handleDirtyModalCancel}>Stay</button>
-                  <button className="bg-warning text-warning-content px-4 py-2 rounded-md font-medium shadow-sm hover:brightness-110" onClick={handleDirtyModalConfirm}>Leave</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

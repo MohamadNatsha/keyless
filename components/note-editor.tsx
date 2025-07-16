@@ -53,49 +53,57 @@ export default function NoteEditor({ note, onCreateNote, onSaveNote, onDeleteNot
     await onSaveNote({ title, content });
   }
 
+  // Add ToolbarItem component
+  function ToolbarItem({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+    return (
+      <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={onClick}>
+        {children}
+      </button>
+    );
+  }
+
   return (
     <div className="bg-base-100 text-base-content rounded-lg h-full w-full shadow-lg">
       {note ? <>
         <div className="w-full overflow-x-auto">
           <div className="flex justify-between">
             <div className="h-14 flex items-center p-4 pb-1 gap-4">
-            <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleBold().run()}>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().toggleBold().run()}>
                 <IconBold />
-              </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleItalic().run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().toggleItalic().run()}>
                 <IconItalic />
-              </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleUnderline().run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().toggleUnderline().run()}>
                 <IconUnderline />
-              </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleStrike().run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().toggleStrike().run()}>
                 <IconStrikethrough />
-              </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleBulletList().run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().toggleBulletList().run()}>
                 <IconList />
-              </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleOrderedList().run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().toggleOrderedList().run()}>
                 <IconListNumbers />
-              </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleHeading({ level: 1 }).run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().toggleHeading({ level: 1 }).run()}>
                 <IconH1 />
-              </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleHeading({ level: 2 }).run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().toggleHeading({ level: 2 }).run()}>
                 <IconH2 />
-              </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().toggleHeading({ level: 3 }).run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().toggleHeading({ level: 3 }).run()}>
                 <IconH3 />
-              </button>
-         
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().setTextAlign('left').run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().setTextAlign('left').run()}>
                 <IconAlignLeft />
-              </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().setTextAlign('center').run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().setTextAlign('center').run()}>
                 <IconAlignCenter />
-              </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={() => getEditor()?.chain().focus().setTextAlign('right').run()}>
+              </ToolbarItem>
+              <ToolbarItem onClick={() => getEditor()?.chain().focus().setTextAlign('right').run()}>
                 <IconAlignRight />
-              </button>
+              </ToolbarItem>
             </div>
             <div className="h-14 flex items-center p-4 pb-1 gap-4">
               <button onClick={saveNote} className="hover:bg-base-content-secondary/30 rounded-sm p-0.5 px-2">
