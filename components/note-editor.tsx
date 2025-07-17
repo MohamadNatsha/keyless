@@ -57,7 +57,7 @@ export default function NoteEditor({ note, onCreateNote, onSaveNote, onDeleteNot
   // Add ToolbarItem component
   function ToolbarItem({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
     return (
-      <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5" onClick={onClick}>
+      <button className="hover:bg-base-content-secondary/30 rounded-sm p-0.5 h-8 w-8 flex items-center justify-center" onClick={onClick}>
         {children}
       </button>
     );
@@ -107,11 +107,11 @@ export default function NoteEditor({ note, onCreateNote, onSaveNote, onDeleteNot
               </ToolbarItem>
             </div>
             <div className="h-14 flex items-center p-4 pb-1 gap-4">
-              <button onClick={saveNote} className="hover:bg-base-content-secondary/30 rounded-sm p-0.5 px-2">
-                <p>Save</p>
+              <button onClick={saveNote} className="hover:bg-base-content-secondary/30 rounded-sm p-0.5 px-2 h-8 flex items-center justify-center">
+                <p className="text-lg font-semibold">Save</p>
               </button>
-              <button className="hover:bg-base-content-secondary/30 rounded-sm p-1" onClick={() => setShowDeleteModal(true)}>
-                <IconTrash  className="w-5 h-5 text-error" />
+              <button className="hover:bg-base-content-secondary/30 rounded-sm p-1 h-8 w-8 flex items-center justify-center" onClick={() => setShowDeleteModal(true)}>
+                <IconTrash  className="text-error" />
               </button>
             </div>
           </div>

@@ -9,6 +9,7 @@ import { PacmanLoader, MoonLoader } from "react-spinners";
 import { IconSearch, IconTextPlus, IconSun, IconMoon, IconX, IconMenu } from "@tabler/icons-react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { DirtyProvider, DirtyContext } from '../components/dirty-context';
+import { toast } from 'react-toastify';
 
 function HomeContent() {
     const {theme, setTheme, systemTheme } = useTheme();
@@ -48,29 +49,36 @@ function HomeContent() {
         setHasMore(true);
         fetchNotes({ search }).then(notes => {
             setNotes(notes);
+
         });
     };
 
     async function fetchNotes(params: { search?: string; offset?: number; } = {}) {
-        const searchParams = [];
-        if (params.search) searchParams.push(`search=${encodeURIComponent(params.search)}`);
-        if ('offset' in params) searchParams.push(`offset=${params.offset}`);
-        
-        const url = `/api/notes${searchParams.length ? '?' + searchParams.join('&') : ''}`;
-        const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) throw new Error("Failed to fetch notes");
-        const notes = await res.json();
+        try {
+            const searchParams = [];
+            if (params.search) searchParams.push(`search=${encodeURIComponent(params.search)}`);
+            if ('offset' in params) searchParams.push(`offset=${params.offset}`);
+            
+            const url = `/api/notes${searchParams.length ? '?' + searchParams.join('&') : ''}`;
+            const res = await fetch(url, { cache: "no-store" });
+            if (!res.ok) throw new Error("Failed to fetch notes");
+            const notes = await res.json();
 
-        if (notes.length < 10) {
-            setHasMore(false);
+            if (notes.length < 10) {
+                setHasMore(false);
+            }
+
+            return notes.map((n: Note) => ({
+                ...n,
+                id: n.id.toString(),
+                createdAt: new Date(n.createdAt),
+                updatedAt: new Date(n.updatedAt),
+            }));
+        } catch (error) {
+            toast.error('Failed to fetch notes. Please try again.');
+            // Return empty array on error to prevent app crashes
+            return [];
         }
-
-        return notes.map((n: Note) => ({
-            ...n,
-            id: n.id.toString(),
-            createdAt: new Date(n.createdAt),
-            updatedAt: new Date(n.updatedAt),
-        }));
     }
 
     async function createNote() {
@@ -91,6 +99,8 @@ function HomeContent() {
             };
             setNotes(prev => [newNote, ...prev]);
             setSelectedNote(newNote);
+        } catch (error) {
+            toast.error('Failed to create note. Please try again.');
         } finally {
             setCreatingNote(false);
         }
@@ -107,37 +117,49 @@ function HomeContent() {
     }
 
     async function deleteNote() {
-        await fetch(`/api/notes/${selectedNote?.id}`, {
-            method: 'DELETE'
-        });
-        setNotes(prev => prev.filter(n => n.id !== selectedNote?.id));
-        setSelectedNote(null);
+        try {
+            const res = await fetch(`/api/notes/${selectedNote?.id}`, {
+                method: 'DELETE'
+            });
+            if (!res.ok) throw new Error('Failed to delete note');
+            setNotes(prev => prev.filter(n => n.id !== selectedNote?.id));
+            setSelectedNote(null);
+        } catch (error) {
+            toast.error('Failed to delete note. Please try again.');
+        }
     }
 
     async function saveNote(note: NoteCreationInput) {
-        await fetch(`/api/notes/${selectedNote?.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(note)
-        });
+        try {
+            const res = await fetch(`/api/notes/${selectedNote?.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(note)
+            });
+            if (!res.ok) throw new Error('Failed to save note');
 
-        setIsDirty(false); // Move this out of setNotes
-        setNotes(prev => {
-            const newNotes = [...prev];
-            const selectedNoteIndex = newNotes.findIndex(n => n.id === selectedNote?.id);
-            if (selectedNoteIndex !== -1) {
-                newNotes[selectedNoteIndex] = {
-                    ...newNotes[selectedNoteIndex],
-                    ...note
-                };
-            }
-            return newNotes;
-        });
+            setIsDirty(false); // Move this out of setNotes
+            setNotes(prev => {
+                const newNotes = [...prev];
+                const selectedNoteIndex = newNotes.findIndex(n => n.id === selectedNote?.id);
+                if (selectedNoteIndex !== -1) {
+                    newNotes[selectedNoteIndex] = {
+                        ...newNotes[selectedNoteIndex],
+                        ...note
+                    };
+                }
+                return newNotes;
+            });
+        } catch (error) {
+            toast.error('Failed to save note. Please try again.');
+        }
     }
 
     function loadMore() {
         fetchNotes({ search, offset: notes.length }).then((notes: Note[]) => {
             setNotes(prev => [...prev, ...notes]);
+        }).catch(error => {
+            toast.error('Failed to load more notes. Please try again.');
         });
     }
 
@@ -216,6 +238,7 @@ function HomeContent() {
                     ) : (
                         <main id="note-scroll-container" className=" overflow-y-auto custom-scrollbar">
                             <InfiniteScroll
+                                key={`infinite-scroll-${search}`}
                                 dataLength={notes.length}
                                 next={loadMore}
                                 hasMore={hasMore}
