@@ -11,7 +11,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { DirtyProvider, DirtyContext } from '../components/dirty-context';
 
 function HomeContent() {
-    const { theme, setTheme, systemTheme } = useTheme();
+    const {theme, setTheme, systemTheme } = useTheme();
     const [notes, setNotes] = useState<Note[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedNote, setSelectedNote] = useState<Note | null>(null);
@@ -20,12 +20,14 @@ function HomeContent() {
     const [creatingNote, setCreatingNote] = useState(false);
     const [isClient, setIsClient] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { isDirty, setIsDirty, setShowWarning } = useContext(DirtyContext);
+    const {isDirty, setIsDirty, setShowWarning } = useContext(DirtyContext);
     const [primaryColor, setPrimaryColor] = useState('#000000');
+    
     useEffect(() => {
         setIsClient(true);
     }, []);
 
+    // Get the primary color from the root element
     useEffect(() => {
         const raf = requestAnimationFrame(() => {
             const root = document.documentElement;
@@ -34,17 +36,6 @@ function HomeContent() {
         });
         return () => cancelAnimationFrame(raf);
     }, [theme, setTheme, systemTheme]);
-
-    useEffect(() => {
-        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            if (isDirty) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        };
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-    }, [isDirty]);
 
     const resolvedTheme = useMemo(() => theme === 'system' ? systemTheme : theme, [theme, systemTheme]);
 
@@ -63,7 +54,8 @@ function HomeContent() {
     async function fetchNotes(params: { search?: string; offset?: number; } = {}) {
         const searchParams = [];
         if (params.search) searchParams.push(`search=${encodeURIComponent(params.search)}`);
-        if (typeof params.offset === 'number') searchParams.push(`offset=${params.offset}`);
+        if ('offset' in params) searchParams.push(`offset=${params.offset}`);
+        
         const url = `/api/notes${searchParams.length ? '?' + searchParams.join('&') : ''}`;
         const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) throw new Error("Failed to fetch notes");

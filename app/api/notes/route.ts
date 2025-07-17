@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from './db';
+import { z } from 'zod';
+
+const noteSchema = z.object({
+  title: z.string(),
+  content: z.string(),
+});
 
 export async function GET(request: Request) {
   const db = await getDb();
@@ -27,7 +33,12 @@ export async function GET(request: Request) {
 
 export async function POST(req: NextRequest) {
   const db = await getDb();
-  const { title, content } = await req.json();
+  const body = await req.json();
+  const parseResult = noteSchema.safeParse(body);
+  if (!parseResult.success) {
+    return NextResponse.json({ error: parseResult.error.flatten() }, { status: 400 });
+  }
+  const { title, content } = parseResult.data;
   const now = new Date().toISOString();
   const insertResult = await db.insertInto('notes')
     .values({ title, content, createdAt: now, updatedAt: now })

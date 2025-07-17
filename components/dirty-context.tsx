@@ -49,6 +49,7 @@ export const DirtyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setOnConfirmCallback(null);
     }
   }, [onConfirmCallback]);
+  
   const handleModalCancel = useCallback(() => {
     setShowWarningState(false);
     setOnConfirmCallback(null);
