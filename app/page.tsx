@@ -185,7 +185,7 @@ function HomeContent() {
 
     return (
         <div className={`relative bg-base-300 h-screen w-screen overflow-hidden grid grid-rows-[100%] grid-cols-[100%] md:grid-cols-[300px_1fr]`}>
-            <div className={`${isSidebarOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'} transition-transform duration-300 max-md:absolute  left-0 bg-base-300 h-full w-full sm:w-[300px]  text-base-content flex flex-col max-h-screen overflow-hidden`}>
+            <div className={`${isSidebarOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'} z-10 transition-transform duration-300 max-md:absolute  left-0 bg-base-300 h-full w-full sm:w-[300px]  text-base-content flex flex-col max-h-screen overflow-hidden`}>
 
                 <aside className="p-4">
                     { /* Mobile only toggle sidebar */}
