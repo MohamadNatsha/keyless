@@ -29,7 +29,7 @@ type NoteEditorProps = {
 };
 
 export default function NoteEditor({ note, onCreateNote, onSaveNote, onDeleteNote }: NoteEditorProps) {
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<HTMLElement & { getEditor?: () => Editor | undefined; getTitle?: () => string; getContent?: () => string }>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { setIsDirty } = useContext(DirtyContext);
 
@@ -41,15 +41,16 @@ export default function NoteEditor({ note, onCreateNote, onSaveNote, onDeleteNot
     return () => {
       noteViewer.removeEventListener('dirty', handleDirty);
     };
-  }, [setIsDirty, note, editorRef.current]);
+  }, [setIsDirty, note]);
 
   function getEditor() {
-   return editorRef.current.getEditor?.() as Editor | undefined;
+    if (!editorRef.current) return undefined;
+    return editorRef.current.getEditor?.() as Editor | undefined;
   }
 
   async function saveNote() {
-    const title = editorRef.current.getTitle() ?? '';
-    const content = editorRef.current.getContent() ?? '';
+    const title = editorRef.current?.getTitle?.() ?? '';
+    const content = editorRef.current?.getContent?.() ?? '';
     await onSaveNote({ title, content });
   }
 
@@ -117,7 +118,7 @@ export default function NoteEditor({ note, onCreateNote, onSaveNote, onDeleteNot
         </div>
 
         <div className="max-h-full w-full custom-scrollbar overflow-y-auto px-4 pt-4  flex flex-col items-center ">
-          {/* @ts-ignore I tried to fix this typescript error using type declartions but it didnt work with so I will ingore the error for now*/}
+          {/* @ts-expect-error I tried to fix this typescript error using type declartions but it didnt work with so I will ingore the error for now*/}
           <note-viewer class="w-full h-full overflow-y-auto"  ref={editorRef} title={note?.title} content={note?.content} />
         </div>
       </> : (

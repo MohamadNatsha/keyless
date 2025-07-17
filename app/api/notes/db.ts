@@ -22,7 +22,7 @@ export const db = new Kysely<DatabaseSchema>({
 });
 
 // Ensure the notes table exists on app start
-let ready = ensureNotesTable();
+const ready = ensureNotesTable();
 
 async function ensureNotesTable() {
   await db.schema

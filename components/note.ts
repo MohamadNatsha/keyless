@@ -1,8 +1,6 @@
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'note-viewer': any;
-    }
+declare module 'react' {
+  interface IntrinsicElements {
+    'note-viewer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
   }
 }
 
@@ -15,9 +13,9 @@ import TextAlign from '@tiptap/extension-text-align';
 
 @customElement('note-viewer')
 export class NoteViewer extends LitElement {
-  public editor?: Editor;
+    public editor?: Editor;
 
-  static styles = css`
+    static styles = css`
     .editor {
       min-height: 150px;
       height: 100%;
@@ -53,80 +51,79 @@ export class NoteViewer extends LitElement {
     }
   `;
 
-  static properties = {
-    title: { type: String },
-    content: { type: String },
-  };
+    static properties = {
+        title: { type: String },
+        content: { type: String },
+    };
 
-  declare title: string;
-  declare content: string;
+    declare title: string;
+    declare content: string;
 
-  firstUpdated() {
-    const editorContainer = this.renderRoot.querySelector('#editor') as HTMLElement;
+    firstUpdated() {
+        const editorContainer = this.renderRoot.querySelector('#editor') as HTMLElement;
 
-    // Prevent Enter from creating a new line in the title
-    const titleDiv = this.renderRoot.querySelector('.title');
-    if (titleDiv) {
-      // Prevent Enter from creating a new line
-      titleDiv.addEventListener('keydown', function(event: Event) {
-        const e = event as KeyboardEvent;
-        if (e.key === 'Enter') {
-          e.preventDefault();
+        // Prevent Enter from creating a new line in the title
+        const titleDiv = this.renderRoot.querySelector('.title');
+        if (titleDiv) {
+            titleDiv.addEventListener('keydown', function (event: Event) {
+                const e = event as KeyboardEvent;
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
         }
-      });
+
+        // Listen for any input event inside the component
+        this.addEventListener('input', () => {
+            this.dispatchEvent(new CustomEvent('dirty', { bubbles: true, composed: true }));
+        });
+
+        this.editor = new Editor({
+            element: editorContainer,
+            extensions: [
+                StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
+                TextAlign.configure({ types: ['heading', 'paragraph'] }),
+            ],
+            content: this.content ?? '<p></p>',
+        });
+
     }
 
-    // Listen for any input event inside the component
-    this.addEventListener('input', () => {
-      this.dispatchEvent(new CustomEvent('dirty', { bubbles: true, composed: true }));
-    });
-
-    this.editor = new Editor({
-      element: editorContainer,
-      extensions: [
-        StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
-        TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      ],
-      content: this.content ?? '<p></p>',
-    });
-  
-  }
-
-  disconnectedCallback() {
-    this.editor?.destroy();
-    super.disconnectedCallback();
-  }
-
-  public getEditor() {
-    return this.editor;
-  }
-
-  public getTitle() {
-    return this.renderRoot.querySelector('.title')?.textContent;
-  }
-
-  public getContent() {
-    return this.editor?.getHTML() ?? '';
-  }
-
-  updated(changedProperties: Map<string, any>) {
-    if (changedProperties.has('content')) {
-      // Only update if the new content is different from the editor's current content
-      if (this.editor && this.content !== this.editor.getHTML()) {
-        // If content is JSON, parse it, otherwise use as string
-        let newContent: any = '<p></p>';
-        try {
-          newContent = JSON.parse(this.content);
-        } catch {
-          newContent = this.content;
-        }
-        this.editor.commands.setContent(newContent);
-      }
+    disconnectedCallback() {
+        this.editor?.destroy();
+        super.disconnectedCallback();
     }
-  }
 
-  render() {
-    return html`
+    public getEditor() {
+        return this.editor;
+    }
+
+    public getTitle() {
+        return this.renderRoot.querySelector('.title')?.textContent;
+    }
+
+    public getContent() {
+        return this.editor?.getHTML() ?? '';
+    }
+
+    updated(changedProperties: Map<string, unknown>) {
+        if (changedProperties.has('content')) {
+            // Only update if the new content is different from the editor's current content
+            if (this.editor && this.content !== this.editor.getHTML()) {
+                // If content is JSON, parse it, otherwise use as string
+                let newContent: string | object = '<p></p>';
+                try {
+                    newContent = JSON.parse(this.content);
+                } catch {
+                    newContent = this.content;
+                }
+                this.editor.commands.setContent(newContent);
+            }
+        }
+    }
+
+    render() {
+        return html`
     <div style="padding: 12px;">
       <div class="title" style="font-size: 24px; font-weight: bold; outline: none; white-space: nowrap;" contenteditable="true">
       ${this.title}
@@ -135,6 +132,6 @@ export class NoteViewer extends LitElement {
       </div>
     </div>
    `;
-  }
+    }
 }
 
