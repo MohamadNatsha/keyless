@@ -33,5 +33,8 @@ I aimed to finish this task in a limited time, so there are definitely areas for
 - Display a message in the editor when a note has unsaved changes
 - Add auto-save that groups changes and syncs them to the server
 - Make animations smoother and more engaging
+- Reduce loading flickering
+- use loading skeleton
+- and others
 
 Thanks for checking out my work! If you have ideas or feedback, I'd love to hear them. 

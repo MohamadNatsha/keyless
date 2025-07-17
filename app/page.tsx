@@ -12,7 +12,7 @@ import { DirtyProvider, DirtyContext } from '../components/dirty-context';
 import { toast } from 'react-toastify';
 
 function HomeContent() {
-    const {theme, setTheme, systemTheme } = useTheme();
+    const { theme, setTheme, systemTheme } = useTheme();
     const [notes, setNotes] = useState<Note[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedNote, setSelectedNote] = useState<Note | null>(null);
@@ -21,9 +21,9 @@ function HomeContent() {
     const [creatingNote, setCreatingNote] = useState(false);
     const [isClient, setIsClient] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const {isDirty, setIsDirty, setShowWarning } = useContext(DirtyContext);
+    const { isDirty, setIsDirty, setShowWarning } = useContext(DirtyContext);
     const [primaryColor, setPrimaryColor] = useState('#000000');
-    
+
     useEffect(() => {
         setIsClient(true);
     }, []);
@@ -58,7 +58,7 @@ function HomeContent() {
             const searchParams = [];
             if (params.search) searchParams.push(`search=${encodeURIComponent(params.search)}`);
             if ('offset' in params) searchParams.push(`offset=${params.offset}`);
-            
+
             const url = `/api/notes${searchParams.length ? '?' + searchParams.join('&') : ''}`;
             const res = await fetch(url, { cache: "no-store" });
             if (!res.ok) throw new Error("Failed to fetch notes");
@@ -255,17 +255,24 @@ function HomeContent() {
                     )
                 }
             </div>
-            <div className="bg-base-300 flex flex-col p-2 pt-4 overflow-hidden">
+            <div className="relative bg-base-300 flex flex-col p-2 pt-4 overflow-hidden">
                 { /* Mobile only toggle sidebar */}
                 <div className="md:hidden h-8 p-2 mb-2 flex items-center justify-between w-full">
                     <button className="rounded transition hover:bg-base-100 text-base-content" aria-label="Toggle theme" onClick={() => setIsSidebarOpen(true)}>
                         <IconMenu className="w-5 h-5" />
                     </button>
                 </div>
+                {
+                    !loading ? <NoteEditor onDeleteNote={deleteNote} onSaveNote={saveNote} note={selectedNote} onCreateNote={createNoteIfNotDirty} />
+                        : <div className="bg-base-100 rounded-lg w-full h-full"></div>
+                }
                 { /* Loading for note editor */}
-                {loading || creatingNote ? <div className=" bg-base-200 rounded-lg flex justify-center items-center h-full">
-                    {isClient && <PacmanLoader className="text-base-content" color={primaryColor}></PacmanLoader>}
-                </div> : <NoteEditor onDeleteNote={deleteNote} onSaveNote={saveNote} note={selectedNote} onCreateNote={createNoteIfNotDirty} />}
+                {
+                    loading || creatingNote ?
+                        <div className="absolute right-2 left-2 top-4 bottom-2 bg-black/20 rounded-lg flex justify-center w-full h-full">
+                            {isClient && <PacmanLoader className="text-base-content absolute top-[30%]" color={primaryColor}></PacmanLoader>}
+                        </div> : null
+                }
             </div>
         </div>
     );
