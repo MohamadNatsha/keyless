@@ -1,7 +1,7 @@
 declare module 'react' {
-  interface IntrinsicElements {
-    'note-viewer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-  }
+    interface IntrinsicElements {
+        'note-viewer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+    }
 }
 
 import { html, css, LitElement } from 'lit';
@@ -99,7 +99,7 @@ export class NoteViewer extends LitElement {
     }
 
     public getTitle() {
-        return this.renderRoot.querySelector('.title')?.textContent;
+        return this.renderRoot.querySelector('.title')?.textContent?.replace('\n', '').trim();
     }
 
     public getContent() {
