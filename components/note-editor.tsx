@@ -119,7 +119,7 @@ export default function NoteEditor({ note, onCreateNote, onSaveNote, onDeleteNot
 
                 <div className="max-h-full w-full custom-scrollbar overflow-y-auto px-4 pt-4  flex flex-col items-center ">
                     {/* @ts-expect-error I tried to fix this typescript error using type declartions but it didnt work with so I will ingore the error for now*/}
-                    <note-viewer class="w-full h-full overflow-y-auto" ref={editorRef} title={note?.title} content={note?.content} />
+                    <note-viewer key={note?.id} class="w-full h-full overflow-y-auto" ref={editorRef} title={note?.title} content={note?.content} />
                 </div>
             </> : (
                 <div className="flex flex-col items-center justify-center h-full">
